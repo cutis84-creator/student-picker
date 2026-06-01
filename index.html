@@ -111,6 +111,7 @@ body{
   flex:1;min-width:0;position:relative;overflow:hidden;
   transition:border-color .3s,box-shadow .3s,background .3s;
   box-shadow:0 4px 24px rgba(0,0,0,.5);
+  padding:8px;
 }
 .slot-box.gender-m{background:var(--male-bg);border-color:var(--male-border);box-shadow:0 4px 24px rgba(79,195,247,.18);}
 .slot-box.gender-f{background:var(--female-bg);border-color:var(--female-border);box-shadow:0 4px 24px rgba(244,143,177,.18);}
@@ -119,24 +120,21 @@ body{
 .slot-box.won.gender-f{border-color:var(--female);box-shadow:0 0 36px rgba(244,143,177,.5);}
 .slot-box.won:not(.gender-m):not(.gender-f){border-color:var(--success);box-shadow:0 0 28px rgba(76,175,80,.55);}
 
-.slot-num{font-size:clamp(18px,5vw,32px);color:var(--text-muted);margin-bottom:2px;font-weight:700;}
-.slot-box.gender-m .slot-num{color:var(--male);opacity:.9;}
-.slot-box.gender-f .slot-num{color:var(--female);opacity:.9;}
+.slot-num{
+  position:absolute;top:14px;left:18px;
+  font-size:clamp(14px,3.5vw,26px);
+  font-weight:700;color:var(--text-muted);line-height:1;
+  opacity:0.75;
+}
+.slot-box.gender-m .slot-num{color:var(--male);}
+.slot-box.gender-f .slot-num{color:var(--female);}
 
 .slot-name{
-  font-size:clamp(56px,18vw,140px);
   font-weight:900;text-align:center;line-height:1.0;color:var(--text);
-  padding:0 6px;word-break:keep-all;
+  white-space:nowrap;padding:0 12px;
 }
 .slot-box.gender-m .slot-name{color:#e8f7ff;}
 .slot-box.gender-f .slot-name{color:#ffe8f3;}
-
-.slots-area.c2 .slot-name{font-size:clamp(40px,11vw,90px);}
-.slots-area.c2 .slot-num{font-size:clamp(14px,3.5vw,24px);}
-.slots-area.c3 .slot-name,.slots-area.c4 .slot-name,
-.slots-area.c5 .slot-name,.slots-area.c6 .slot-name{font-size:clamp(28px,7vw,60px);}
-.slots-area.c3 .slot-num,.slots-area.c4 .slot-num,
-.slots-area.c5 .slot-num,.slots-area.c6 .slot-num{font-size:clamp(12px,2.5vw,18px);}
 
 @keyframes pop{0%{transform:scale(.6);opacity:.4;}60%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
 .slot-name.won-anim{animation:pop .5s cubic-bezier(.34,1.56,.64,1);}
@@ -765,19 +763,33 @@ function runSlots(cnt,results,pool,onDone){
     },i*350);
   });
 }
+function fitSlotText(idx){
+  const box=document.getElementById('slot-'+idx);
+  const nm=document.getElementById('sm-'+idx);
+  if(!box||!nm)return;
+  const maxH=box.clientHeight-48;
+  const maxW=box.clientWidth-24;
+  for(let s=600;s>=10;s-=2){
+    nm.style.fontSize=s+'px';
+    if(nm.scrollWidth<=maxW&&nm.scrollHeight<=maxH)break;
+  }
+}
 function animateSlot(idx,finalText,subText,gender,pool,cb){
   const nm=document.getElementById('sm-'+idx);
   const nu=document.getElementById('sn-'+idx);
   const box=document.getElementById('slot-'+idx);
   box.className='slot-box spinning';nm.className='slot-name';
+  nu.textContent='';nm.style.fontSize='';
   const dur=1800+idx*350,t0=Date.now();let iv=55;
   const tick=()=>{
     const prog=(Date.now()-t0)/dur;
     if(prog<1){
       nm.textContent=pool[Math.floor(Math.random()*pool.length)];
+      fitSlotText(idx);
       playTick();iv=55+Math.pow(prog,2)*320;setTimeout(tick,iv);
     }else{
       nm.textContent=finalText;nu.textContent=subText;
+      fitSlotText(idx);
       const gc=gender==='남'?'gender-m':gender==='여'?'gender-f':'';
       box.className='slot-box won'+(gc?' '+gc:'');
       nm.className='slot-name won-anim';if(cb)cb();
