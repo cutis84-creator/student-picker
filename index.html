@@ -2,8 +2,10 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="학생뽑기">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f0f1a">
 <title>학생 뽑기</title>
@@ -17,20 +19,28 @@
   --text:#fff;--text-muted:#90a4ae;
   --success:#4caf50;--warning:#ffa726;--danger:#ef5350;
   --border:#2a2a4a;
+  --nav-h:64px;
+  --header-h:52px;
+  --safe-b:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;width:100%;}
 body{
   font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;
   background:var(--bg);color:var(--text);
-  height:100dvh;display:flex;flex-direction:column;overflow:hidden;
+  display:flex;flex-direction:column;overflow:hidden;
+  height:100dvh;
 }
 
-/* HEADER */
+/* ── HEADER ── */
 .header{
-  background:var(--surface);padding:10px 14px;
+  background:var(--surface);
+  padding:0 14px;
+  padding-top:env(safe-area-inset-top,0px);
   display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--border);flex-shrink:0;gap:8px;
-  height:52px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;gap:8px;
+  height:calc(var(--header-h) + env(safe-area-inset-top,0px));
 }
 .header-title{font-size:18px;font-weight:700;color:var(--primary);white-space:nowrap;}
 .class-selector{
@@ -38,42 +48,52 @@ body{
   padding:6px 8px;border-radius:8px;font-size:14px;flex:1;min-width:0;max-width:160px;
 }
 .header-icons{display:flex;gap:2px;}
-.btn-icon{background:none;border:none;color:var(--text-muted);font-size:20px;padding:4px 6px;cursor:pointer;line-height:1;}
+.btn-icon{background:none;border:none;color:var(--text-muted);font-size:20px;padding:6px;cursor:pointer;line-height:1;min-width:36px;min-height:36px;}
 
-/* SCREENS */
-.screen{display:none;flex:1;overflow-y:auto;padding-bottom:64px;}
+/* ── SCREENS ── */
+.screen{
+  display:none;
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));
+}
 .screen.active{display:flex;flex-direction:column;}
-/* 메인 화면은 overflow hidden, 내부 스크롤 없음 */
-#screen-main.active{overflow:hidden;}
+#screen-main.active{overflow:hidden;padding-bottom:0;}
 
-/* BOTTOM NAV */
+/* ── BOTTOM NAV ── */
 .bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;height:64px;
-  background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  display:flex;
+  z-index:1000;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));
 }
-.nav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:8px 0;cursor:pointer;background:none;border:none;
-  color:var(--text-muted);font-size:11px;gap:2px;transition:color .2s;
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:6px 0;
+  background:none;border:none;
+  color:var(--text-muted);font-size:11px;gap:3px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:rgba(91,141,238,.15);
+  touch-action:manipulation;
+  min-height:var(--nav-h);
 }
-.nav-item .icon{font-size:22px;line-height:1;}
-.nav-item.active{color:var(--primary);}
+.nav-btn .icon{font-size:22px;line-height:1;}
+.nav-btn.active{color:var(--primary);}
 
-/* ────────────────────────────────────────────────
-   메인 화면 레이아웃
-   슬롯이 화면 가득, 뽑기 버튼 아래 고정
-──────────────────────────────────────────────── */
+/* ── 메인 레이아웃 ── */
 .main-layout{
   display:flex;flex-direction:column;
-  height:calc(100dvh - 52px - 64px); /* header + nav */
+  flex:1;
   overflow:hidden;
+  height:calc(100dvh - var(--header-h) - env(safe-area-inset-top,0px));
 }
-
-/* 슬롯 영역 — 남은 공간 전부 */
 .slots-wrap{
   flex:1;display:flex;flex-direction:column;
-  padding:10px 12px 6px;overflow:hidden;
-  min-height:0;
+  padding:10px 12px 6px;overflow:hidden;min-height:0;
 }
 .slots-area{
   display:flex;gap:10px;height:100%;
@@ -84,69 +104,48 @@ body{
   line-height:1.8;align-self:center;width:100%;
 }
 
-/* SLOT BOX */
+/* ── SLOT BOX ── */
 .slot-box{
-  background:var(--surface);
-  border:3px solid var(--border);
-  border-radius:24px;
+  background:var(--surface);border:3px solid var(--border);border-radius:24px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  flex:1;min-width:0;
-  position:relative;overflow:hidden;
+  flex:1;min-width:0;position:relative;overflow:hidden;
   transition:border-color .3s,box-shadow .3s,background .3s;
   box-shadow:0 4px 24px rgba(0,0,0,.5);
 }
-/* 성별 색상 */
-.slot-box.gender-m{
-  background:var(--male-bg);
-  border-color:var(--male-border);
-  box-shadow:0 4px 24px rgba(79,195,247,.18);
-}
-.slot-box.gender-f{
-  background:var(--female-bg);
-  border-color:var(--female-border);
-  box-shadow:0 4px 24px rgba(244,143,177,.18);
-}
+.slot-box.gender-m{background:var(--male-bg);border-color:var(--male-border);box-shadow:0 4px 24px rgba(79,195,247,.18);}
+.slot-box.gender-f{background:var(--female-bg);border-color:var(--female-border);box-shadow:0 4px 24px rgba(244,143,177,.18);}
 .slot-box.spinning{border-color:var(--primary);box-shadow:0 0 28px rgba(91,141,238,.6);}
 .slot-box.won.gender-m{border-color:var(--male);box-shadow:0 0 36px rgba(79,195,247,.5);}
 .slot-box.won.gender-f{border-color:var(--female);box-shadow:0 0 36px rgba(244,143,177,.5);}
 .slot-box.won:not(.gender-m):not(.gender-f){border-color:var(--success);box-shadow:0 0 28px rgba(76,175,80,.55);}
 
-.slot-num{
-  font-size:clamp(18px,5vw,32px);color:var(--text-muted);
-  margin-bottom:2px;font-weight:700;letter-spacing:.5px;
-}
+.slot-num{font-size:clamp(18px,5vw,32px);color:var(--text-muted);margin-bottom:2px;font-weight:700;}
 .slot-box.gender-m .slot-num{color:var(--male);opacity:.9;}
 .slot-box.gender-f .slot-num{color:var(--female);opacity:.9;}
 
 .slot-name{
   font-size:clamp(56px,18vw,140px);
-  font-weight:900;text-align:center;
-  line-height:1.0;color:var(--text);
+  font-weight:900;text-align:center;line-height:1.0;color:var(--text);
   padding:0 6px;word-break:keep-all;
 }
 .slot-box.gender-m .slot-name{color:#e8f7ff;}
 .slot-box.gender-f .slot-name{color:#ffe8f3;}
 
-/* 2명 이상일 때 축소 */
 .slots-area.c2 .slot-name{font-size:clamp(40px,11vw,90px);}
 .slots-area.c2 .slot-num{font-size:clamp(14px,3.5vw,24px);}
-.slots-area.c3 .slot-name,
-.slots-area.c4 .slot-name,
-.slots-area.c5 .slot-name,
-.slots-area.c6 .slot-name{font-size:clamp(28px,7vw,60px);}
-.slots-area.c3 .slot-num,
-.slots-area.c4 .slot-num,
-.slots-area.c5 .slot-num,
-.slots-area.c6 .slot-num{font-size:clamp(12px,2.5vw,18px);}
+.slots-area.c3 .slot-name,.slots-area.c4 .slot-name,
+.slots-area.c5 .slot-name,.slots-area.c6 .slot-name{font-size:clamp(28px,7vw,60px);}
+.slots-area.c3 .slot-num,.slots-area.c4 .slot-num,
+.slots-area.c5 .slot-num,.slots-area.c6 .slot-num{font-size:clamp(12px,2.5vw,18px);}
 
 @keyframes pop{0%{transform:scale(.6);opacity:.4;}60%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
 .slot-name.won-anim{animation:pop .5s cubic-bezier(.34,1.56,.64,1);}
 
-/* PICK BUTTON 영역 */
+/* ── PICK AREA ── */
 .pick-area{
-  padding:6px 12px 8px;
-  display:flex;flex-direction:column;gap:6px;
-  flex-shrink:0;
+  padding:6px 12px;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 6px);
+  display:flex;flex-direction:column;gap:6px;flex-shrink:0;
 }
 .pick-btn{
   padding:16px;
@@ -154,18 +153,17 @@ body{
   border:none;border-radius:16px;color:#fff;font-size:20px;font-weight:700;
   cursor:pointer;transition:transform .1s,opacity .2s;
   box-shadow:0 4px 20px rgba(91,141,238,.4);width:100%;
+  touch-action:manipulation;min-height:56px;
 }
 .pick-btn:active{transform:scale(.97);}
 .pick-btn:disabled{opacity:.5;cursor:not-allowed;}
 
-/* 뽑힌 목록 (메인화면 하단 컴팩트) */
-/* 뽑힌 목록 — 세로, 최신순 위 */
+/* ── 뽑힌 목록 ── */
 .picked-bar{
   display:flex;flex-direction:column;gap:4px;padding:0 2px;
-  max-height:130px;overflow-y:auto;overflow-x:hidden;
+  max-height:120px;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
 }
-.picked-bar::-webkit-scrollbar{width:3px;}
-.picked-bar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 .picked-chip{
   padding:6px 12px;border-radius:10px;font-size:15px;font-weight:700;
   border:1px solid var(--border);background:var(--surface);
@@ -177,101 +175,54 @@ body{
 .picked-chip.f{border-color:var(--female-border);background:var(--female-bg);color:var(--female);}
 .picked-chip.n{border-color:var(--success);color:var(--success);}
 
-/* ────────────────────────────────────────────────
-   설정 탭 (settings)
-──────────────────────────────────────────────── */
+/* ── 설정 탭 ── */
 .settings-screen{padding:12px 14px;}
-.settings-group{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:14px;margin-bottom:12px;overflow:hidden;
-}
-.settings-group-title{
-  font-size:12px;font-weight:700;color:var(--text-muted);
-  letter-spacing:.8px;text-transform:uppercase;
-  padding:10px 14px 6px;border-bottom:1px solid var(--border);
-}
-.settings-row{
-  display:flex;align-items:center;gap:10px;
-  padding:12px 14px;border-bottom:1px solid var(--border);
-}
+.settings-group{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden;}
+.settings-group-title{font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;padding:10px 14px 6px;border-bottom:1px solid var(--border);}
+.settings-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);}
 .settings-row:last-child{border-bottom:none;}
 .settings-label{flex:1;font-size:15px;font-weight:500;}
-.settings-label small{display:block;font-size:12px;color:var(--text-muted);font-weight:400;margin-top:2px;}
 
-/* 필터 버튼 */
 .filter-group{display:flex;gap:6px;padding:10px 14px;}
-.filter-btn{
-  flex:1;padding:9px 6px;border:2px solid var(--border);border-radius:12px;
-  background:var(--surface2);color:var(--text-muted);font-size:14px;font-weight:600;
-  cursor:pointer;transition:all .2s;
-}
+.filter-btn{flex:1;padding:9px 6px;border:2px solid var(--border);border-radius:12px;background:var(--surface2);color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;touch-action:manipulation;}
 .filter-btn[data-f="all"].active{border-color:var(--primary);background:var(--primary);color:#fff;}
 .filter-btn[data-f="male"].active{border-color:var(--male);background:var(--male-bg);color:var(--male);}
 .filter-btn[data-f="female"].active{border-color:var(--female);background:var(--female-bg);color:var(--female);}
 
-/* 모드 토글 */
 .mode-toggle{display:flex;gap:6px;padding:10px 14px;}
-.mode-btn{
-  flex:1;padding:10px;border:2px solid var(--border);border-radius:12px;
-  font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;
-  background:var(--surface2);color:var(--text-muted);
-}
+.mode-btn{flex:1;padding:10px;border:2px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--surface2);color:var(--text-muted);touch-action:manipulation;}
 .mode-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
 
-/* 인원수 */
 .count-controls{display:flex;align-items:center;gap:10px;}
-.count-btn{
-  width:36px;height:36px;border-radius:10px;border:1px solid var(--border);
-  background:var(--surface2);color:var(--text);font-size:22px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;
-}
+.count-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;touch-action:manipulation;}
 .count-num{font-size:22px;font-weight:700;min-width:32px;text-align:center;}
 
-/* 번호 범위 */
 .num-range-row{display:flex;align-items:center;gap:10px;padding:10px 14px;}
-.num-range-row input{
-  width:80px;background:var(--surface2);border:1px solid var(--border);
-  color:var(--text);padding:8px 10px;border-radius:10px;
-  font-size:18px;font-weight:700;text-align:center;
-}
+.num-range-row input{width:80px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:10px;font-size:18px;font-weight:700;text-align:center;}
 .num-range-row input:focus{outline:none;border-color:var(--primary);}
 .num-range-row span{color:var(--text-muted);font-size:15px;}
 
-/* 통계 */
 .stats-row{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;}
-.stat-chip{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text-muted);
-}
+.stat-chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text-muted);}
 .stat-chip b{color:var(--text);}
 
-/* 액션 버튼들 */
 .action-group{display:flex;gap:8px;padding:10px 14px;}
-.action-btn{
-  flex:1;padding:11px 6px;border:1px solid var(--border);border-radius:12px;
-  background:var(--surface2);color:var(--text-muted);font-size:13px;cursor:pointer;text-align:center;
-}
+.action-btn{flex:1;padding:12px 6px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);color:var(--text-muted);font-size:13px;cursor:pointer;text-align:center;touch-action:manipulation;min-height:44px;}
 .action-btn.red{color:var(--danger);border-color:var(--danger);}
 
-/* ────────────────────────────────────────────────
-   학생 관리 탭
-──────────────────────────────────────────────── */
+/* ── 학생 관리 ── */
 .section{padding:14px;}
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .section-title{font-size:16px;font-weight:600;}
-.btn-p{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:14px;cursor:pointer;font-weight:600;}
-.btn-s{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:14px;cursor:pointer;}
+.btn-p{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:14px;cursor:pointer;font-weight:600;min-height:44px;touch-action:manipulation;}
+.btn-s{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:14px;cursor:pointer;min-height:44px;touch-action:manipulation;}
 hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
 .class-list{display:flex;flex-direction:column;gap:8px;margin-bottom:6px;}
-.class-item{
-  background:var(--surface2);border:1px solid var(--border);border-radius:12px;
-  padding:12px 14px;display:flex;align-items:center;justify-content:space-between;
-  cursor:pointer;transition:border-color .2s;
-}
+.class-item{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .2s;touch-action:manipulation;}
 .class-item.active{border-color:var(--primary);}
 .class-item-name{font-size:16px;font-weight:600;}
 .class-item-count{font-size:13px;color:var(--text-muted);margin-top:2px;}
-.btn-del-class{background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;}
+.btn-del-class{background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;min-height:36px;touch-action:manipulation;}
 .add-form{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
 .form-row{display:flex;gap:8px;margin-bottom:8px;}
 .fi{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;font-size:15px;}
@@ -287,16 +238,15 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
 .gbadge.m{background:rgba(79,195,247,.15);color:var(--male);}
 .gbadge.f{background:rgba(244,143,177,.15);color:var(--female);}
 .s-actions{display:flex;gap:4px;}
-.btn-exc{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;}
+.btn-exc{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:6px;padding:6px 10px;font-size:11px;cursor:pointer;min-height:36px;touch-action:manipulation;}
 .student-item.is-excluded .btn-exc{border-color:var(--warning);color:var(--warning);}
-.btn-x{background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:2px 4px;}
+.btn-x{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px 6px;min-height:36px;touch-action:manipulation;}
 .csv-info{background:var(--surface2);border-radius:10px;padding:12px;font-size:13px;color:var(--text-muted);margin-bottom:8px;line-height:1.7;}
 .csv-info code{background:var(--border);padding:1px 5px;border-radius:4px;color:var(--text);}
-.file-label{display:block;background:var(--surface2);border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;color:var(--text-muted);font-size:14px;transition:border-color .2s;}
-.file-label:hover{border-color:var(--primary);color:var(--text);}
+.file-label{display:block;background:var(--surface2);border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;color:var(--text-muted);font-size:14px;touch-action:manipulation;}
 #csv-input{display:none;}
 
-/* HISTORY */
+/* ── 이력 ── */
 .history-list{display:flex;flex-direction:column;gap:8px;}
 .history-item{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;}
 .history-date{font-size:12px;color:var(--text-muted);margin-bottom:4px;}
@@ -307,36 +257,21 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
 .chip.f{border-color:var(--female);color:var(--female);}
 .chip.n{border-color:var(--success);color:var(--success);}
 
-/* MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:16px;}
+/* ── 모달 ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:16px;}
 .overlay.show{display:flex;}
 .modal{background:var(--surface);border-radius:16px;padding:22px;width:100%;max-width:400px;border:1px solid var(--border);}
 .modal-title{font-size:18px;font-weight:700;margin-bottom:14px;}
 .modal-btns{display:flex;gap:8px;margin-top:14px;}
-.modal-btns .btn-p,.modal-btns .btn-s{flex:1;padding:12px;text-align:center;border-radius:10px;}
+.modal-btns .btn-p,.modal-btns .btn-s{flex:1;padding:14px;text-align:center;border-radius:10px;}
 
-/* TOAST */
-.toast{
-  position:fixed;bottom:74px;left:50%;
-  transform:translateX(-50%) translateY(16px);
-  background:var(--surface2);color:var(--text);padding:10px 20px;
-  border-radius:20px;font-size:14px;opacity:0;transition:all .3s;
-  z-index:300;white-space:nowrap;border:1px solid var(--border);pointer-events:none;
-}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 10px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface2);color:var(--text);padding:10px 20px;border-radius:20px;font-size:14px;opacity:0;transition:all .3s;z-index:600;white-space:nowrap;border:1px solid var(--border);pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* EMPTY */
 .empty{text-align:center;padding:40px 16px;color:var(--text-muted);}
 .empty-icon{font-size:44px;margin-bottom:10px;}
 .empty p{font-size:14px;line-height:1.7;}
-
-/* ── 가로 모드 ── */
-@media(orientation:landscape) and (max-height:520px){
-  .main-layout{flex-direction:row;}
-  .pick-area{width:200px;flex-shrink:0;border-left:1px solid var(--border);justify-content:center;}
-  .slots-wrap{flex:1;}
-  .pick-btn{font-size:16px;padding:14px;}
-}
 </style>
 </head>
 <body>
@@ -345,113 +280,96 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
 
 <div class="header">
   <div class="header-title">🎰 학생 뽑기</div>
-  <select class="class-selector" id="class-select" onchange="selectClass(this.value)">
-    <option value="">반 선택</option>
-  </select>
+  <select class="class-selector" id="class-select"></select>
   <div class="header-icons">
-    <button class="btn-icon" onclick="toggleFS()">⛶</button>
-    <button class="btn-icon" id="snd-btn" onclick="toggleSound()">🔊</button>
+    <button class="btn-icon" id="fs-btn">⛶</button>
+    <button class="btn-icon" id="snd-btn">🔊</button>
   </div>
 </div>
 
-<!-- ① 메인 뽑기 화면 -->
+<!-- ① 뽑기 -->
 <div class="screen active" id="screen-main">
   <div class="main-layout">
-    <!-- 슬롯 영역 -->
     <div class="slots-wrap">
       <div class="slots-area" id="slots-area">
         <div class="slot-placeholder">반을 선택하고<br>뽑기를 시작하세요!</div>
       </div>
     </div>
-    <!-- 뽑기 버튼 + 뽑힌 칩 -->
     <div class="pick-area">
       <div class="picked-bar" id="picked-bar"></div>
-      <button class="pick-btn" id="pick-btn" onclick="startPicking()">🎲 뽑기 시작!</button>
+      <button class="pick-btn" id="pick-btn">🎲 뽑기 시작!</button>
     </div>
   </div>
 </div>
 
-<!-- ② 설정 화면 -->
+<!-- ② 설정 -->
 <div class="screen" id="screen-settings">
   <div class="settings-screen">
-
-    <!-- 뽑기 모드 -->
     <div class="settings-group">
       <div class="settings-group-title">뽑기 모드</div>
       <div class="mode-toggle">
-        <button class="mode-btn active" data-mode="name" onclick="setMode('name')">이름 뽑기</button>
-        <button class="mode-btn" data-mode="number" onclick="setMode('number')">번호 뽑기</button>
+        <button class="mode-btn active" data-mode="name">이름 뽑기</button>
+        <button class="mode-btn" data-mode="number">번호 뽑기</button>
       </div>
     </div>
-
-    <!-- 이름 모드 전용 -->
     <div id="nm-ctrl">
       <div class="settings-group">
         <div class="settings-group-title">성별 필터</div>
         <div class="filter-group">
-          <button class="filter-btn active" data-f="all" onclick="setFilter('all')">전체</button>
-          <button class="filter-btn" data-f="male" onclick="setFilter('male')">남학생</button>
-          <button class="filter-btn" data-f="female" onclick="setFilter('female')">여학생</button>
+          <button class="filter-btn active" data-f="all">전체</button>
+          <button class="filter-btn" data-f="male">남학생</button>
+          <button class="filter-btn" data-f="female">여학생</button>
         </div>
         <div class="stats-row" id="stats-row"></div>
       </div>
     </div>
-
-    <!-- 번호 모드 전용 -->
     <div id="num-ctrl" style="display:none">
       <div class="settings-group">
         <div class="settings-group-title">번호 범위</div>
         <div class="num-range-row">
           <span>1번부터</span>
-          <input type="number" id="num-max" value="30" min="2" max="999" onchange="onNumMaxChange()">
+          <input type="number" id="num-max" value="30" min="2" max="999">
           <span>번까지</span>
         </div>
         <div class="stats-row" id="num-stats-row"></div>
       </div>
     </div>
-
-    <!-- 뽑을 인원 -->
     <div class="settings-group">
       <div class="settings-group-title">뽑을 인원</div>
       <div class="settings-row">
         <span class="settings-label">한 번에 뽑을 수</span>
         <div class="count-controls">
-          <button class="count-btn" onclick="changeCount(-1)">−</button>
+          <button class="count-btn" id="count-minus">−</button>
           <span class="count-num" id="count-num">1</span>
-          <button class="count-btn" onclick="changeCount(1)">+</button>
+          <button class="count-btn" id="count-plus">+</button>
         </div>
         <span style="color:var(--text-muted);font-size:14px">명</span>
       </div>
     </div>
-
-    <!-- 액션 -->
     <div class="settings-group">
       <div class="settings-group-title">관리</div>
       <div class="action-group">
-        <button class="action-btn" id="exclude-btn" onclick="showExcludeModal()">⛔ 제외 설정</button>
-        <button class="action-btn red" onclick="resetPicked()">🔄 리셋</button>
-        <button class="action-btn" onclick="showTab('history')">📋 이력</button>
+        <button class="action-btn" id="exclude-btn">⛔ 제외 설정</button>
+        <button class="action-btn red" id="reset-btn">🔄 리셋</button>
+        <button class="action-btn" id="goto-history-btn">📋 이력</button>
       </div>
     </div>
-
-    <!-- 사운드 -->
     <div class="settings-group">
       <div class="settings-group-title">효과음</div>
       <div class="settings-row">
         <span class="settings-label">효과음</span>
-        <button class="btn-s" id="snd-toggle-btn" onclick="toggleSound()">🔊 켜짐</button>
+        <button class="btn-s" id="snd-toggle-btn">🔊 켜짐</button>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ③ 학생 관리 탭 -->
+<!-- ③ 학생 관리 -->
 <div class="screen" id="screen-students">
   <div class="section">
     <div class="section-header">
       <span class="section-title">반 관리</span>
-      <button class="btn-p" onclick="showAddClassModal()">+ 반 추가</button>
+      <button class="btn-p" id="add-class-btn">+ 반 추가</button>
     </div>
     <div class="class-list" id="class-list"></div>
   </div>
@@ -459,7 +377,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
   <div class="section" id="student-section" style="display:none">
     <div class="section-header">
       <span class="section-title" id="student-section-title">학생 목록</span>
-      <button class="btn-s" onclick="toggleAddForm()">+ 추가</button>
+      <button class="btn-s" id="toggle-add-form-btn">+ 추가</button>
     </div>
     <div id="add-form-wrap" style="display:none">
       <div class="add-form">
@@ -469,8 +387,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
           <select class="fs" id="new-gender"><option value="남">남</option><option value="여">여</option></select>
         </div>
         <div class="form-row" style="margin-bottom:0">
-          <button class="btn-p" style="flex:1;padding:10px" onclick="addStudent()">추가</button>
-          <button class="btn-s" style="flex:1;padding:10px" onclick="toggleAddForm()">취소</button>
+          <button class="btn-p" style="flex:1;padding:10px" id="add-student-btn">추가</button>
+          <button class="btn-s" style="flex:1;padding:10px" id="cancel-add-btn">취소</button>
         </div>
       </div>
     </div>
@@ -481,32 +399,30 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
     <div class="csv-info">
       엑셀에서 <code>학년,반,번호,이름,성별</code> 순서로 입력 후<br>
       <b>파일 → 다른 이름으로 저장 → CSV UTF-8</b> 로 저장하세요.<br>
-      예: <code>1,2,1,김철수,남</code> → <b>1학년 2반</b>으로 자동 분류<br>
-      여러 반을 한 파일에 넣으면 반별로 자동으로 나눠집니다.<br>
-      ※ 헤더 행은 자동으로 건너뜁니다.
+      예: <code>1,2,1,김철수,남</code> → <b>1학년 2반</b>으로 자동 분류
     </div>
     <label class="file-label" for="csv-input">📂 CSV 파일 선택하기</label>
-    <input type="file" id="csv-input" accept=".csv,.txt" onchange="importCSV(event)">
+    <input type="file" id="csv-input" accept=".csv,.txt">
   </div>
 </div>
 
-<!-- ④ 이력 탭 -->
+<!-- ④ 이력 -->
 <div class="screen" id="screen-history">
   <div class="section">
     <div class="section-header">
       <span class="section-title">뽑기 이력</span>
-      <button class="btn-s" onclick="clearHistory()">전체 삭제</button>
+      <button class="btn-s" id="clear-history-btn">전체 삭제</button>
     </div>
     <div class="history-list" id="history-list"></div>
   </div>
 </div>
 
-<!-- 하단 네비게이션 (4탭) -->
+<!-- 하단 탭 -->
 <nav class="bottom-nav">
-  <button class="nav-item active"  id="nav-main"     onclick="showTab('main')"><span class="icon">🎰</span>뽑기</button>
-  <button class="nav-item"         id="nav-settings"  onclick="showTab('settings')"><span class="icon">⚙️</span>설정</button>
-  <button class="nav-item"         id="nav-students"  onclick="showTab('students')"><span class="icon">👥</span>학생관리</button>
-  <button class="nav-item"         id="nav-history"   onclick="showTab('history')"><span class="icon">📋</span>이력</button>
+  <button class="nav-btn active" data-tab="main"><span class="icon">🎰</span>뽑기</button>
+  <button class="nav-btn" data-tab="settings"><span class="icon">⚙️</span>설정</button>
+  <button class="nav-btn" data-tab="students"><span class="icon">👥</span>학생관리</button>
+  <button class="nav-btn" data-tab="history"><span class="icon">📋</span>이력</button>
 </nav>
 
 <!-- 모달: 반 추가 -->
@@ -515,8 +431,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
     <div class="modal-title">반 추가</div>
     <input class="fi" id="new-class" placeholder="반 이름 (예: 1반, 2-3반)" style="width:100%">
     <div class="modal-btns">
-      <button class="btn-p" onclick="addClass()">추가</button>
-      <button class="btn-s" onclick="closeModal('modal-class')">취소</button>
+      <button class="btn-p" id="modal-add-class-btn">추가</button>
+      <button class="btn-s" id="modal-cancel-class-btn">취소</button>
     </div>
   </div>
 </div>
@@ -525,10 +441,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
 <div class="overlay" id="modal-exclude">
   <div class="modal">
     <div class="modal-title">제외 학생 관리</div>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px">제외된 학생은 뽑기에서 빠집니다. 삭제는 아니에요.</p>
-    <div id="exclude-list" style="max-height:320px;overflow-y:auto"></div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px">제외된 학생은 뽑기에서 빠집니다.</p>
+    <div id="exclude-list" style="max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
     <div class="modal-btns">
-      <button class="btn-s" style="width:100%;padding:12px" onclick="closeModal('modal-exclude')">닫기</button>
+      <button class="btn-s" style="width:100%;padding:14px" id="close-exclude-btn">닫기</button>
     </div>
   </div>
 </div>
@@ -536,116 +452,111 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
 <div class="toast" id="toast"></div>
 
 <script>
-// ── STATE ──────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
 const S={
-  classes:{}, current:null, filter:'all', count:1,
-  animating:false, history:[], sound:true,
-  mode:'name', numMax:30, pickedNums:[], pickedLog:[]
+  classes:{},current:null,filter:'all',count:1,
+  animating:false,history:[],sound:true,
+  mode:'name',numMax:30,pickedNums:[],pickedLog:[]
 };
 let _actx=null;
 
-// ── STORAGE ────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════
 function save(){
-  localStorage.setItem('sp_v3',JSON.stringify({
+  try{localStorage.setItem('sp_v4',JSON.stringify({
     classes:S.classes,current:S.current,history:S.history,sound:S.sound,
     mode:S.mode,numMax:S.numMax,pickedNums:S.pickedNums,pickedLog:S.pickedLog
-  }));
+  }));}catch(e){}
 }
 function load(){
   try{
-    const d=JSON.parse(localStorage.getItem('sp_v3')||'null');
+    const d=JSON.parse(localStorage.getItem('sp_v4')||localStorage.getItem('sp_v3')||'null');
     if(d){
       S.classes=d.classes||{};S.current=d.current||null;
       S.history=d.history||[];S.sound=d.sound!==false;
-      S.mode=d.mode||'name';S.numMax=d.numMax||30;S.pickedNums=d.pickedNums||[];S.pickedLog=d.pickedLog||[];
+      S.mode=d.mode||'name';S.numMax=d.numMax||30;
+      S.pickedNums=d.pickedNums||[];S.pickedLog=d.pickedLog||[];
     }
   }catch(e){}
 }
 
-// ── AUDIO ──────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// AUDIO
+// ══════════════════════════════════════════
 function actx(){if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();return _actx;}
 function playTick(){
   if(!S.sound)return;
-  try{
-    const c=actx(),o=c.createOscillator(),g=c.createGain();
+  try{const c=actx(),o=c.createOscillator(),g=c.createGain();
     o.connect(g);g.connect(c.destination);
     o.frequency.value=500+Math.random()*300;o.type='square';
     g.gain.setValueAtTime(.04,c.currentTime);
     g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.05);
-    o.start();o.stop(c.currentTime+.05);
-  }catch(e){}
+    o.start();o.stop(c.currentTime+.05);}catch(e){}
 }
 function playFanfare(){
   if(!S.sound)return;
-  try{
-    const c=actx();
+  try{const c=actx();
     [[523,0],[659,.1],[784,.2],[1047,.35],[784,.5],[1047,.65]].forEach(([f,t])=>{
       const o=c.createOscillator(),g=c.createGain();
-      o.connect(g);g.connect(c.destination);
-      o.frequency.value=f;o.type='triangle';
+      o.connect(g);g.connect(c.destination);o.frequency.value=f;o.type='triangle';
       const st=c.currentTime+t;
-      g.gain.setValueAtTime(0,st);
-      g.gain.linearRampToValueAtTime(.22,st+.04);
-      g.gain.exponentialRampToValueAtTime(.001,st+.42);
-      o.start(st);o.stop(st+.42);
-    });
-  }catch(e){}
+      g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.22,st+.04);
+      g.gain.exponentialRampToValueAtTime(.001,st+.42);o.start(st);o.stop(st+.42);
+    });}catch(e){}
 }
 function toggleSound(){
   S.sound=!S.sound;
-  const label=S.sound?'🔊':'🔇';
-  document.getElementById('snd-btn').textContent=label;
-  const tb=document.getElementById('snd-toggle-btn');
-  if(tb)tb.textContent=S.sound?'🔊 켜짐':'🔇 꺼짐';
+  document.getElementById('snd-btn').textContent=S.sound?'🔊':'🔇';
+  document.getElementById('snd-toggle-btn').textContent=S.sound?'🔊 켜짐':'🔇 꺼짐';
   save();toast(S.sound?'효과음 켜짐':'효과음 꺼짐');
 }
 
-// ── 팡파레 ─────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// CONFETTI
+// ══════════════════════════════════════════
 function launchConfetti(){
   const cv=document.getElementById('confetti-cvs');
-  cv.width=window.innerWidth;cv.height=window.innerHeight;
-  cv.style.display='block';
+  cv.width=window.innerWidth;cv.height=window.innerHeight;cv.style.display='block';
   const ctx=cv.getContext('2d');
-  const cols=['#4fc3f7','#f48fb1','#ffd54f','#a5d6a7','#ce93d8','#ff8a65','#80deea','#ffcc02'];
+  const cols=['#4fc3f7','#f48fb1','#ffd54f','#a5d6a7','#ce93d8','#ff8a65'];
   const ps=Array.from({length:100},()=>({
-    x:Math.random()*cv.width,y:-20,
-    w:7+Math.random()*9,h:4+Math.random()*5,
+    x:Math.random()*cv.width,y:-20,w:7+Math.random()*9,h:4+Math.random()*5,
     color:cols[Math.floor(Math.random()*cols.length)],
     vx:(Math.random()-.5)*6,vy:2+Math.random()*5,
     rot:Math.random()*Math.PI*2,rv:(Math.random()-.5)*.15,op:1
   }));
   let frame=0;
   const step=()=>{
-    ctx.clearRect(0,0,cv.width,cv.height);
-    let alive=false;
+    ctx.clearRect(0,0,cv.width,cv.height);let alive=false;
     ps.forEach(p=>{
       p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.rot+=p.rv;
-      if(frame>55)p.op-=.016;
-      if(p.op>0){alive=true;}
+      if(frame>55)p.op-=.016;if(p.op>0)alive=true;
       ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);
       ctx.globalAlpha=Math.max(0,p.op);ctx.fillStyle=p.color;
-      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
-      ctx.restore();
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();
     });
-    frame++;
-    if(alive)requestAnimationFrame(step);
-    else cv.style.display='none';
+    frame++;if(alive)requestAnimationFrame(step);else cv.style.display='none';
   };
   requestAnimationFrame(step);
 }
 
-// ── NAV ────────────────────────────────────────────────────────────────────
-const TABS=['main','settings','students','history'];
+// ══════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════
 function showTab(tab){
-  TABS.forEach(t=>{
-    document.getElementById('screen-'+t).classList.toggle('active',t===tab);
-    document.getElementById('nav-'+t).classList.toggle('active',t===tab);
-  });
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  document.getElementById('screen-'+tab).classList.add('active');
   if(tab==='students')renderStudentScreen();
   if(tab==='history')renderHistory();
 }
 
-// ── MODE ───────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// MODE
+// ══════════════════════════════════════════
 function setMode(m){
   S.mode=m;
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
@@ -656,41 +567,37 @@ function setMode(m){
   save();buildSlots();renderStats();renderPickedBar();
 }
 
-// ── CLASS ──────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// CLASS
+// ══════════════════════════════════════════
 function updateSelect(){
   const sel=document.getElementById('class-select');
   sel.innerHTML='<option value="">반 선택</option>';
   Object.keys(S.classes).forEach(n=>{
     const o=document.createElement('option');
-    o.value=n;o.textContent=n;
-    if(n===S.current)o.selected=true;
+    o.value=n;o.textContent=n;if(n===S.current)o.selected=true;
     sel.appendChild(o);
   });
 }
 function selectClass(name){S.current=name||null;save();renderMain();}
-function showAddClassModal(){
-  document.getElementById('new-class').value='';
-  document.getElementById('modal-class').classList.add('show');
-  setTimeout(()=>document.getElementById('new-class').focus(),120);
-}
 function addClass(){
   const n=document.getElementById('new-class').value.trim();
   if(!n)return toast('반 이름을 입력하세요');
   if(S.classes[n])return toast('이미 있는 반 이름입니다');
   S.classes[n]=[];S.current=n;save();
-  updateSelect();closeModal('modal-class');
-  renderStudentScreen();renderMain();
-  toast(`"${n}" 반 추가됨`);
+  updateSelect();closeModal('modal-class');renderStudentScreen();renderMain();
+  toast('"'+n+'" 반 추가됨');
 }
 function deleteClass(name){
-  if(!confirm(`"${name}" 반을 삭제할까요?\n학생 목록도 모두 삭제됩니다.`))return;
+  if(!confirm('"'+name+'" 반을 삭제할까요?\n학생 목록도 모두 삭제됩니다.'))return;
   delete S.classes[name];
   if(S.current===name)S.current=Object.keys(S.classes)[0]||null;
-  save();updateSelect();renderStudentScreen();renderMain();
-  toast(`"${name}" 반 삭제됨`);
+  save();updateSelect();renderStudentScreen();renderMain();toast('"'+name+'" 반 삭제됨');
 }
 
-// ── STUDENTS ───────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// STUDENTS
+// ══════════════════════════════════════════
 function getAll(){return S.current?(S.classes[S.current]||[]):[]; }
 function eligible(){
   let a=getAll().filter(s=>!s.excluded&&!s.picked);
@@ -706,7 +613,6 @@ function toggleAddForm(){
     const max=getAll().length?Math.max(...getAll().map(s=>s.number))+1:1;
     document.getElementById('new-num').value=max;
     document.getElementById('new-name').value='';
-    document.getElementById('new-name').focus();
   }
 }
 function addStudent(){
@@ -721,8 +627,7 @@ function addStudent(){
   save();
   document.getElementById('new-name').value='';
   document.getElementById('new-num').value=num+1;
-  renderStudentList();renderMain();
-  toast(`${name} 추가됨`);
+  renderStudentList();renderMain();toast(name+' 추가됨');
 }
 function deleteStudent(id){
   if(!S.current)return;
@@ -734,7 +639,9 @@ function toggleExclude(id){
   if(s){s.excluded=!s.excluded;save();renderStudentList();renderMain();}
 }
 
-// ── CSV ────────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// CSV
+// ══════════════════════════════════════════
 function importCSV(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
@@ -742,8 +649,7 @@ function importCSV(e){
     let text=ev.target.result;
     if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
     const lines=text.split(/\r?\n/).filter(l=>l.trim());
-    let added=0,skipped=0;
-    const nc={};
+    let added=0,skipped=0;const nc={};
     lines.forEach(line=>{
       const p=line.split(',').map(x=>x.trim());
       if(p.length<5){skipped++;return;}
@@ -751,7 +657,7 @@ function importCSV(e){
       if(grade==='학년'||ns==='번호'||name==='이름')return;
       const g=parseInt(grade),c=parseInt(cls),num=parseInt(ns);
       if(isNaN(g)||isNaN(c)||isNaN(num)||!name||!['남','여'].includes(gender)){skipped++;return;}
-      const key=`${g}학년 ${c}반`;
+      const key=g+'학년 '+c+'반';
       if(!nc[key])nc[key]=[];
       nc[key].push({id:Date.now()+Math.random(),number:num,name,gender,picked:false,excluded:false});
       added++;
@@ -760,14 +666,15 @@ function importCSV(e){
     keys.forEach(key=>{nc[key].sort((a,b)=>a.number-b.number);S.classes[key]=nc[key];});
     if(keys.length>0&&!S.current)S.current=keys[0];
     save();updateSelect();renderStudentScreen();renderMain();
-    const summary=keys.map(k=>`${k}(${nc[k].length}명)`).join(', ');
-    toast(`${added}명 추가됨: ${summary}${skipped?` / ${skipped}줄 건너뜀`:''}`);
+    toast(added+'명 추가됨'+(skipped?' / '+skipped+'줄 건너뜀':''));
     e.target.value='';
   };
   reader.readAsText(file,'UTF-8');
 }
 
-// ── FILTER / COUNT ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// FILTER / COUNT
+// ══════════════════════════════════════════
 function setFilter(f){
   S.filter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===f));
@@ -785,33 +692,31 @@ function changeCount(d){
   buildSlots();
 }
 
-// ── SLOT BUILD ─────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// SLOTS
+// ══════════════════════════════════════════
 function buildSlots(){
   const area=document.getElementById('slots-area');
   if(S.mode==='name'&&(!S.current||getAll().length===0)){
     area.className='slots-area';
-    area.innerHTML='<div class="slot-placeholder">반을 선택하고<br>뽑기를 시작하세요!</div>';
-    return;
+    area.innerHTML='<div class="slot-placeholder">반을 선택하고<br>뽑기를 시작하세요!</div>';return;
   }
   if(S.mode==='number'&&(S.numMax-S.pickedNums.length)<=0){
     area.className='slots-area';
-    area.innerHTML='<div class="slot-placeholder">모든 번호를 뽑았습니다.<br>리셋 후 다시 시작하세요!</div>';
-    return;
+    area.innerHTML='<div class="slot-placeholder">모든 번호를 뽑았습니다.<br>리셋 후 다시 시작하세요!</div>';return;
   }
-  area.className='slots-area c'+S.count;
-  area.innerHTML='';
+  area.className='slots-area c'+S.count;area.innerHTML='';
   for(let i=0;i<S.count;i++){
     const box=document.createElement('div');
     box.className='slot-box';box.id='slot-'+i;
-    box.innerHTML=`<div class="slot-num" id="sn-${i}"></div><div class="slot-name" id="sm-${i}">?</div>`;
+    box.innerHTML='<div class="slot-num" id="sn-'+i+'"></div><div class="slot-name" id="sm-'+i+'">?</div>';
     area.appendChild(box);
   }
 }
 
-// ── PICKING ────────────────────────────────────────────────────────────────
-// 마지막 뽑힌 결과 저장 (성별 색 적용용)
-let _lastPicked=[];
-
+// ══════════════════════════════════════════
+// PICKING
+// ══════════════════════════════════════════
 function startPicking(){
   if(S.animating)return;
   S.mode==='name'?startNamePick():startNumPick();
@@ -823,10 +728,8 @@ function startNamePick(){
   const cnt=Math.min(S.count,pool.length);
   const picked=[...pool].sort(()=>Math.random()-.5).slice(0,cnt);
   picked.forEach(p=>{const s=getAll().find(s=>s.id===p.id);if(s)s.picked=true;});
-  _lastPicked=picked;
   runSlots(cnt,picked.map(s=>({main:s.name,sub:s.number+'번',gender:s.gender})),pool.map(s=>s.name),()=>{
-    addToHistory({type:'name',cls:S.current,filter:S.filter,
-      names:picked.map(s=>({number:s.number,name:s.name,gender:s.gender}))});
+    addToHistory({type:'name',cls:S.current,filter:S.filter,names:picked.map(s=>({number:s.number,name:s.name,gender:s.gender}))});
     picked.forEach(s=>S.pickedLog.unshift({type:'name',number:s.number,name:s.name,gender:s.gender}));
     save();renderStats();renderPickedBar();
   });
@@ -838,7 +741,6 @@ function startNumPick(){
   const cnt=Math.min(S.count,avail.length);
   const picked=[...avail].sort(()=>Math.random()-.5).slice(0,cnt);
   picked.forEach(n=>S.pickedNums.push(n));
-  _lastPicked=[];
   runSlots(cnt,picked.map(n=>({main:String(n),sub:'',gender:null})),avail.map(String),()=>{
     addToHistory({type:'number',numMax:S.numMax,nums:picked});
     picked.forEach(n=>S.pickedLog.unshift({type:'number',num:n}));
@@ -856,8 +758,7 @@ function runSlots(cnt,results,pool,onDone){
         done++;
         if(done===cnt){
           playFanfare();launchConfetti();
-          S.animating=false;
-          btn.disabled=false;btn.textContent='🎲 다시 뽑기!';
+          S.animating=false;btn.disabled=false;btn.textContent='🎲 다시 뽑기!';
           if(onDone)onDone();
         }
       });
@@ -869,23 +770,17 @@ function animateSlot(idx,finalText,subText,gender,pool,cb){
   const nu=document.getElementById('sn-'+idx);
   const box=document.getElementById('slot-'+idx);
   box.className='slot-box spinning';nm.className='slot-name';
-  const dur=1800+idx*350,t0=Date.now();
-  let iv=55;
+  const dur=1800+idx*350,t0=Date.now();let iv=55;
   const tick=()=>{
     const prog=(Date.now()-t0)/dur;
     if(prog<1){
       nm.textContent=pool[Math.floor(Math.random()*pool.length)];
-      playTick();
-      iv=55+Math.pow(prog,2)*320;
-      setTimeout(tick,iv);
+      playTick();iv=55+Math.pow(prog,2)*320;setTimeout(tick,iv);
     }else{
-      nm.textContent=finalText;
-      nu.textContent=subText;
-      // 성별 클래스 적용
+      nm.textContent=finalText;nu.textContent=subText;
       const gc=gender==='남'?'gender-m':gender==='여'?'gender-f':'';
       box.className='slot-box won'+(gc?' '+gc:'');
-      nm.className='slot-name won-anim';
-      if(cb)cb();
+      nm.className='slot-name won-anim';if(cb)cb();
     }
   };
   tick();
@@ -893,13 +788,15 @@ function animateSlot(idx,finalText,subText,gender,pool,cb){
 function resetPicked(){
   if(S.mode==='name'){if(!S.current)return;getAll().forEach(s=>s.picked=false);}
   else S.pickedNums=[];
-  _lastPicked=[];S.pickedLog=[];
+  S.pickedLog=[];
   save();buildSlots();renderStats();renderPickedBar();
   document.getElementById('pick-btn').textContent='🎲 뽑기 시작!';
   toast('리셋 완료!');
 }
 
-// ── EXCLUDE MODAL ──────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// EXCLUDE
+// ══════════════════════════════════════════
 function showExcludeModal(){
   if(!S.current)return toast('반을 선택하세요');
   renderExcludeList();
@@ -909,44 +806,41 @@ function renderExcludeList(){
   const sts=getAll(),el=document.getElementById('exclude-list');
   if(!sts.length){el.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:16px">학생이 없습니다</p>';return;}
   el.innerHTML=sts.map(s=>`
-    <div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border)">
       <span style="color:var(--text-muted);min-width:30px;font-size:13px">${s.number}번</span>
       <span style="flex:1;font-size:15px">${s.name}</span>
       <span style="font-size:12px;color:${s.gender==='남'?'var(--male)':'var(--female)'}">${s.gender}</span>
-      <button onclick="toggleExclude(${s.id});renderExcludeList();"
-        style="border:1px solid ${s.excluded?'var(--warning)':'var(--border)'};color:${s.excluded?'var(--warning)':'var(--text-muted)'};background:none;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer">
+      <button data-id="${s.id}" data-excluded="${s.excluded?'1':'0'}"
+        style="border:1px solid ${s.excluded?'var(--warning)':'var(--border)'};color:${s.excluded?'var(--warning)':'var(--text-muted)'};background:none;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;min-height:36px;touch-action:manipulation"
+        class="exc-toggle-btn">
         ${s.excluded?'제외중':'제외'}
       </button>
     </div>`).join('');
 }
 
-// ── HISTORY ────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// HISTORY
+// ══════════════════════════════════════════
 function addToHistory(entry){
   const now=new Date();
-  const ds=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const ds=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes());
   S.history.unshift({...entry,date:ds});
   if(S.history.length>300)S.history=S.history.slice(0,300);
 }
 function pad(n){return String(n).padStart(2,'0');}
 function renderHistory(){
   const el=document.getElementById('history-list');
-  if(!S.history.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>아직 뽑기 이력이 없습니다</p></div>';return;
-  }
+  if(!S.history.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>아직 뽑기 이력이 없습니다</p></div>';return;}
   el.innerHTML=S.history.map(h=>{
     let label,chips;
     if(h.type==='number'){
-      label=`번호 뽑기 (1~${h.numMax})`;
-      chips=h.nums.map(n=>`<span class="chip n">${n}번</span>`).join('');
+      label='번호 뽑기 (1~'+h.numMax+')';
+      chips=h.nums.map(n=>'<span class="chip n">'+n+'번</span>').join('');
     }else{
-      label=`${h.cls} · ${{all:'전체',male:'남학생',female:'여학생'}[h.filter]||'전체'}`;
-      chips=(h.names||[]).map(n=>`<span class="chip ${n.gender==='남'?'m':'f'}">${n.number}번 ${n.name}</span>`).join('');
+      label=h.cls+' · '+({all:'전체',male:'남학생',female:'여학생'}[h.filter]||'전체');
+      chips=(h.names||[]).map(n=>'<span class="chip '+(n.gender==='남'?'m':'f')+'">'+n.number+'번 '+n.name+'</span>').join('');
     }
-    return `<div class="history-item">
-      <div class="history-date">${h.date}</div>
-      <div class="history-class">${label}</div>
-      <div class="history-chips">${chips}</div>
-    </div>`;
+    return '<div class="history-item"><div class="history-date">'+h.date+'</div><div class="history-class">'+label+'</div><div class="history-chips">'+chips+'</div></div>';
   }).join('');
 }
 function clearHistory(){
@@ -954,7 +848,9 @@ function clearHistory(){
   S.history=[];save();renderHistory();toast('이력 삭제됨');
 }
 
-// ── RENDER ─────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
 function renderMain(){
   updateSelect();
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===S.mode));
@@ -964,9 +860,8 @@ function renderMain(){
   document.getElementById('exclude-btn').style.display=S.mode==='name'?'':'none';
   if(S.mode==='number')document.getElementById('num-max').value=S.numMax;
   document.getElementById('count-num').textContent=S.count;
-  const sb=document.getElementById('snd-toggle-btn');
-  if(sb)sb.textContent=S.sound?'🔊 켜짐':'🔇 꺼짐';
   document.getElementById('snd-btn').textContent=S.sound?'🔊':'🔇';
+  document.getElementById('snd-toggle-btn').textContent=S.sound?'🔊 켜짐':'🔇 꺼짐';
   renderStats();buildSlots();renderPickedBar();
 }
 function renderStats(){
@@ -976,46 +871,38 @@ function renderStats(){
   const all=getAll().filter(s=>!s.excluded);
   const m=all.filter(s=>s.gender==='남'),f=all.filter(s=>s.gender==='여');
   let pool=all;
-  if(S.filter==='male')pool=m;
-  if(S.filter==='female')pool=f;
+  if(S.filter==='male')pool=m;if(S.filter==='female')pool=f;
   const rem=pool.filter(s=>!s.picked).length;
-  el.innerHTML=`
-    <div class="stat-chip">전체 <b>${all.length}</b>명</div>
-    <div class="stat-chip" style="color:var(--male)">남 <b>${m.length}</b></div>
-    <div class="stat-chip" style="color:var(--female)">여 <b>${f.length}</b></div>
-    <div class="stat-chip">남은 <b style="color:var(--success)">${rem}</b>명</div>`;
+  el.innerHTML='<div class="stat-chip">전체 <b>'+all.length+'</b>명</div>'
+    +'<div class="stat-chip" style="color:var(--male)">남 <b>'+m.length+'</b></div>'
+    +'<div class="stat-chip" style="color:var(--female)">여 <b>'+f.length+'</b></div>'
+    +'<div class="stat-chip">남은 <b style="color:var(--success)">'+rem+'</b>명</div>';
 }
 function renderNumStats(){
   const el=document.getElementById('num-stats-row');
   const total=S.numMax,picked=S.pickedNums.length,rem=total-picked;
-  el.innerHTML=`
-    <div class="stat-chip">전체 <b>${total}</b>개</div>
-    <div class="stat-chip">뽑힘 <b>${picked}</b>개</div>
-    <div class="stat-chip">남은 <b style="color:var(--success)">${rem}</b>개</div>`;
+  el.innerHTML='<div class="stat-chip">전체 <b>'+total+'</b>개</div>'
+    +'<div class="stat-chip">뽑힘 <b>'+picked+'</b>개</div>'
+    +'<div class="stat-chip">남은 <b style="color:var(--success)">'+rem+'</b>개</div>';
 }
-
-/* 뽑힌 학생 칩 바 (메인화면 하단) */
 function renderPickedBar(){
   const bar=document.getElementById('picked-bar');
-  const log=S.pickedLog; // 최신이 앞(index 0)
+  const log=S.pickedLog;
   if(!log.length){bar.innerHTML='';return;}
   const total=log.length;
   bar.innerHTML=log.map((e,i)=>{
-    const order=total-i; // 나온 순서 번호 (1번째 뽑힌 게 숫자 1)
-    if(e.type==='number'){
-      return `<span class="picked-chip n"><span class="chip-order">${order}.</span> ${e.num}번</span>`;
-    }
+    const order=total-i;
+    if(e.type==='number')return '<span class="picked-chip n"><span class="chip-order">'+order+'.</span> '+e.num+'번</span>';
     const gc=e.gender==='남'?'m':'f';
-    return `<span class="picked-chip ${gc}"><span class="chip-order">${order}.</span> ${e.name} <span class="chip-num">${e.number}번</span></span>`;
+    return '<span class="picked-chip '+gc+'"><span class="chip-order">'+order+'.</span> '+e.name+' <span class="chip-num">'+e.number+'번</span></span>';
   }).join('');
 }
-
 function renderStudentScreen(){
   renderClassList();
   const sec=document.getElementById('student-section');
   if(S.current){
     sec.style.display='block';
-    document.getElementById('student-section-title').textContent=`${S.current} 학생 목록`;
+    document.getElementById('student-section-title').textContent=S.current+' 학생 목록';
     renderStudentList();
   }else sec.style.display='none';
 }
@@ -1025,62 +912,133 @@ function renderClassList(){
   if(!keys.length){el.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:16px;font-size:14px">반을 추가하세요</div>';return;}
   el.innerHTML=keys.map(n=>{
     const sts=S.classes[n];
-    return`<div class="class-item ${n===S.current?'active':''}" onclick="pickClass('${n}')">
-      <div>
-        <div class="class-item-name">${n}</div>
-        <div class="class-item-count">${sts.length}명 · 남 ${sts.filter(s=>s.gender==='남').length} / 여 ${sts.filter(s=>s.gender==='여').length}</div>
-      </div>
-      <button class="btn-del-class" onclick="event.stopPropagation();deleteClass('${n}')">삭제</button>
-    </div>`;
+    const mCnt=sts.filter(s=>s.gender==='남').length;
+    const fCnt=sts.filter(s=>s.gender==='여').length;
+    return '<div class="class-item'+(n===S.current?' active':'')+'" data-class="'+n+'">'
+      +'<div><div class="class-item-name">'+n+'</div>'
+      +'<div class="class-item-count">'+sts.length+'명 · 남 '+mCnt+' / 여 '+fCnt+'</div></div>'
+      +'<button class="btn-del-class" data-del-class="'+n+'">삭제</button></div>';
   }).join('');
 }
-function pickClass(n){S.current=n;save();updateSelect();renderStudentScreen();renderMain();}
 function renderStudentList(){
   const el=document.getElementById('student-list');
   const sts=getAll();
-  if(!sts.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">👤</div><p>학생을 추가하거나<br>CSV 파일을 불러오세요</p></div>';return;
-  }
-  el.innerHTML=sts.map(s=>`
-    <div class="student-item ${s.picked?'is-picked':''} ${s.excluded?'is-excluded':''}">
-      <span class="s-num">${s.number}번</span>
-      <span class="s-name">${s.name}</span>
-      <span class="gbadge ${s.gender==='남'?'m':'f'}">${s.gender}</span>
-      <div class="s-actions">
-        <button class="btn-exc" onclick="toggleExclude(${s.id});renderStudentList();">${s.excluded?'제외중':'제외'}</button>
-        <button class="btn-x" onclick="if(confirm('${s.name} 학생을 삭제할까요?'))deleteStudent(${s.id})">✕</button>
-      </div>
-    </div>`).join('');
+  if(!sts.length){el.innerHTML='<div class="empty"><div class="empty-icon">👤</div><p>학생을 추가하거나<br>CSV 파일을 불러오세요</p></div>';return;}
+  el.innerHTML=sts.map(s=>'<div class="student-item'+(s.picked?' is-picked':'')+(s.excluded?' is-excluded':'')+'">'
+    +'<span class="s-num">'+s.number+'번</span>'
+    +'<span class="s-name">'+s.name+'</span>'
+    +'<span class="gbadge '+(s.gender==='남'?'m':'f')+'">'+s.gender+'</span>'
+    +'<div class="s-actions">'
+    +'<button class="btn-exc" data-exc-id="'+s.id+'">'+(s.excluded?'제외중':'제외')+'</button>'
+    +'<button class="btn-x" data-del-id="'+s.id+'" data-del-name="'+s.name+'">✕</button>'
+    +'</div></div>').join('');
 }
 
-// ── UTILS ──────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
 function toast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 function closeModal(id){document.getElementById(id).classList.remove('show');}
-function toggleFS(){
-  if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
-  else document.exitFullscreen();
-}
-document.querySelectorAll('.overlay').forEach(o=>{
-  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');});
-});
-document.getElementById('new-class').addEventListener('keydown',e=>{if(e.key==='Enter')addClass();});
-document.getElementById('new-name').addEventListener('keydown',e=>{if(e.key==='Enter')addStudent();});
-document.addEventListener('keydown',e=>{
-  if(e.code==='Space'document.getElementById('new-name').addEventListener('keydown',e=>{if(e.key==='Enter')addStudent();});document.getElementById('new-name').addEventListener('keydown',e=>{if(e.key==='Enter')addStudent();});e.target===document.body){
-    e.preventDefault();
-    const mainActive=document.getElementById('screen-main').classList.contains('active');
-    if(mainActive)startPicking();
-  }
-});
 
-// ── INIT ───────────────────────────────────────────────────────────────────
-load();
-renderMain();
-updateSelect();
+// ══════════════════════════════════════════
+// 이벤트 — onclick 대신 addEventListener로 전부 연결
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+
+  // 탭 네비게이션
+  document.querySelectorAll('.nav-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>showTab(btn.dataset.tab));
+  });
+
+  // 헤더
+  document.getElementById('fs-btn').addEventListener('click',()=>{
+    if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+    else document.exitFullscreen();
+  });
+  document.getElementById('snd-btn').addEventListener('click',toggleSound);
+  document.getElementById('class-select').addEventListener('change',e=>selectClass(e.target.value));
+
+  // 뽑기 버튼
+  document.getElementById('pick-btn').addEventListener('click',startPicking);
+
+  // 설정
+  document.querySelectorAll('.mode-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>setMode(btn.dataset.mode));
+  });
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>setFilter(btn.dataset.f));
+  });
+  document.getElementById('count-minus').addEventListener('click',()=>changeCount(-1));
+  document.getElementById('count-plus').addEventListener('click',()=>changeCount(1));
+  document.getElementById('num-max').addEventListener('change',onNumMaxChange);
+  document.getElementById('exclude-btn').addEventListener('click',showExcludeModal);
+  document.getElementById('reset-btn').addEventListener('click',resetPicked);
+  document.getElementById('goto-history-btn').addEventListener('click',()=>showTab('history'));
+  document.getElementById('snd-toggle-btn').addEventListener('click',toggleSound);
+
+  // 학생 관리
+  document.getElementById('add-class-btn').addEventListener('click',()=>{
+    document.getElementById('new-class').value='';
+    document.getElementById('modal-class').classList.add('show');
+    setTimeout(()=>document.getElementById('new-class').focus(),120);
+  });
+  document.getElementById('toggle-add-form-btn').addEventListener('click',toggleAddForm);
+  document.getElementById('add-student-btn').addEventListener('click',addStudent);
+  document.getElementById('cancel-add-btn').addEventListener('click',toggleAddForm);
+  document.getElementById('csv-input').addEventListener('change',importCSV);
+
+  // 이력
+  document.getElementById('clear-history-btn').addEventListener('click',clearHistory);
+
+  // 모달
+  document.getElementById('modal-add-class-btn').addEventListener('click',addClass);
+  document.getElementById('modal-cancel-class-btn').addEventListener('click',()=>closeModal('modal-class'));
+  document.getElementById('close-exclude-btn').addEventListener('click',()=>closeModal('modal-exclude'));
+  document.getElementById('new-class').addEventListener('keydown',e=>{if(e.key==='Enter')addClass();});
+  document.getElementById('new-name').addEventListener('keydown',e=>{if(e.key==='Enter')addStudent();});
+
+  // 오버레이 바깥 클릭 닫기
+  document.querySelectorAll('.overlay').forEach(o=>{
+    o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');});
+  });
+
+  // 이벤트 위임 — class-list
+  document.getElementById('class-list').addEventListener('click',e=>{
+    const delBtn=e.target.closest('[data-del-class]');
+    const item=e.target.closest('[data-class]');
+    if(delBtn){e.stopPropagation();deleteClass(delBtn.dataset.delClass);return;}
+    if(item){S.current=item.dataset.class;save();updateSelect();renderStudentScreen();renderMain();}
+  });
+
+  // 이벤트 위임 — student-list
+  document.getElementById('student-list').addEventListener('click',e=>{
+    const excBtn=e.target.closest('[data-exc-id]');
+    const delBtn=e.target.closest('[data-del-id]');
+    if(excBtn){toggleExclude(parseFloat(excBtn.dataset.excId));renderStudentList();return;}
+    if(delBtn){if(confirm(delBtn.dataset.delName+' 학생을 삭제할까요?'))deleteStudent(parseFloat(delBtn.dataset.delId));}
+  });
+
+  // 이벤트 위임 — exclude-list (모달)
+  document.getElementById('exclude-list').addEventListener('click',e=>{
+    const btn=e.target.closest('.exc-toggle-btn');
+    if(btn){toggleExclude(parseFloat(btn.dataset.id));renderExcludeList();}
+  });
+
+  // 스페이스바 뽑기
+  document.addEventListener('keydown',e=>{
+    if(e.code==='Space'&&e.target===document.body){
+      e.preventDefault();
+      if(document.getElementById('screen-main').classList.contains('active'))startPicking();
+    }
+  });
+
+  // 초기화
+  load();renderMain();updateSelect();
+});
 </script>
 </body>
 </html>
